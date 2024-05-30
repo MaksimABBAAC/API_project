@@ -55,19 +55,6 @@ app.include_router(
 )
 
 
-current_user = fastapi_users.current_user()
-
-
-@app.get("/protected-route")
-def protected_route(user: User = Depends(current_user)):
-    return f"Hello, {user.username}"
-
-
-@app.get("/unprotected-route")
-def protected_route():
-    return f"Hello, anonym"
-
-
 @app.get("/user")
 async def get_user_by_id(id_user: int, session: AsyncSession = Depends(get_async_session)):
     query = select(user.c.username, user.c.email).where(user.c.id == id_user)
