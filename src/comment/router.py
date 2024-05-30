@@ -26,10 +26,3 @@ async def add_comment_id_coin(new_comment: CommentCreate, session: AsyncSession 
     await session.execute(stmt)
     await session.commit()
     return {"status": "success"}
-
-
-@router.get("/user")
-async def get_user_by_id(id_user: int, session: AsyncSession = Depends(get_async_session)):
-    query = select(user.c.username, user.c.email).where(user.c.id == id_user)
-    result = await session.execute(query)
-    return result.mappings().all()

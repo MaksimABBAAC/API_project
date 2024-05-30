@@ -1,7 +1,9 @@
 from fastapi_users import FastAPIUsers
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.auth import auth_backend
-from src.database import User
+from src.auth.models import User, user
 from src.auth.manager import get_user_manager
 from src.auth.schemas import UserRead, UserCreate
 from src.coin.router import router as router_coin
@@ -12,6 +14,7 @@ from fastapi import applications
 from fastapi.openapi.docs import get_swagger_ui_html
 
 from src.comment.router import router as router_comment
+from src.database import get_async_session
 
 
 def swagger_monkey_patch(*args, **kwargs):
@@ -63,6 +66,13 @@ def protected_route(user: User = Depends(current_user)):
 @app.get("/unprotected-route")
 def protected_route():
     return f"Hello, anonym"
+
+
+@app.get("/user")
+async def get_user_by_id(id_user: int, session: AsyncSession = Depends(get_async_session)):
+    query = select(user.c.username, user.c.email).where(user.c.id == id_user)
+    result = await session.execute(query)
+    return result.mappings().all()
 
 
 origins = [
